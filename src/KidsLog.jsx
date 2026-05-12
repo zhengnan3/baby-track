@@ -19,7 +19,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
 
-// Activity types with colors
 const ACTIVITY_TYPES = {
   eat: { label: '🍽️ Eat', color: 'bg-blue-100 text-blue-900' },
   sleep: { label: '😴 Sleep', color: 'bg-purple-100 text-purple-900' },
@@ -38,7 +37,6 @@ function KidsLog() {
   const [editingId, setEditingId] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
 
-  // Sign in anonymously when room code is provided
   useEffect(() => {
     if (roomCode && !isAuthenticated) {
       signInAnonymously(auth)
@@ -50,10 +48,8 @@ function KidsLog() {
     }
   }, [roomCode]);
 
-  // Load entries from Firebase
   const loadEntries = () => {
     if (!roomCode) return;
-
     const entriesRef = ref(database, `rooms/${roomCode}/entries`);
     onValue(entriesRef, (snapshot) => {
       const data = snapshot.val();
@@ -63,9 +59,7 @@ function KidsLog() {
           ...entry,
           timestamp: new Date(entry.timestamp)
         }));
-        // Sort by newest first
         entriesList.sort((a, b) => b.timestamp - a.timestamp);
-        // Only keep last 10 days
         const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000);
         setEntries(entriesList.filter(e => e.timestamp > tenDaysAgo));
       } else {
@@ -74,13 +68,11 @@ function KidsLog() {
     });
   };
 
-  // Add new entry
   const handleAddEntry = async () => {
     if (!childName.trim()) {
       alert('Please enter child name');
       return;
     }
-
     const entry = {
       childName,
       activityType,
@@ -88,12 +80,9 @@ function KidsLog() {
       notes,
       createdAt: new Date().toISOString()
     };
-
     try {
       const entriesRef = ref(database, `rooms/${roomCode}/entries`);
       await push(entriesRef, entry);
-
-      // Reset form
       setChildName('');
       setActivityType('eat');
       setNotes('');
@@ -104,7 +93,6 @@ function KidsLog() {
     }
   };
 
-  // Delete entry
   const handleDeleteEntry = async (id) => {
     if (window.confirm('Delete this entry?')) {
       try {
@@ -116,10 +104,8 @@ function KidsLog() {
     }
   };
 
-  // Edit entry
   const handleEditEntry = async (id) => {
     if (!editingEntry) return;
-
     try {
       const entryRef = ref(database, `rooms/${roomCode}/entries/${id}`);
       await update(entryRef, editingEntry);
@@ -130,7 +116,6 @@ function KidsLog() {
     }
   };
 
-  // Room code entry screen
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
@@ -139,12 +124,9 @@ function KidsLog() {
             <h1 className="text-3xl font-bold text-gray-800 mb-2">Kids Activity Log</h1>
             <p className="text-gray-600">Track eating, sleeping, and diaper changes</p>
           </div>
-
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Enter Family Room Code
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Enter Family Room Code</label>
               <input
                 type="text"
                 value={newRoomCode}
@@ -157,11 +139,8 @@ function KidsLog() {
                   }
                 }}
               />
-              <p className="text-xs text-gray-500 mt-2">
-                Create a code (like "FAMILY123") and share it with your family. Everyone uses the same code to access the log.
-              </p>
+              <p className="text-xs text-gray-500 mt-2">Create a code and share it with your family. Everyone uses the same code.</p>
             </div>
-
             <button
               onClick={() => setRoomCode(newRoomCode)}
               disabled={!newRoomCode.trim()}
@@ -175,10 +154,8 @@ function KidsLog() {
     );
   }
 
-  // Main app
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4 flex justify-between items-center">
           <div>
@@ -197,18 +174,13 @@ function KidsLog() {
           </button>
         </div>
       </div>
-
       <div className="max-w-2xl mx-auto p-4 pb-20">
-        {/* Add Entry Form */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4">Add Entry</h2>
-
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Child Name
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Child Name</label>
                 <input
                   type="text"
                   value={childName}
@@ -217,29 +189,21 @@ function KidsLog() {
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
-
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Activity Type
-                </label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Activity Type</label>
                 <select
                   value={activityType}
                   onChange={(e) => setActivityType(e.target.value)}
                   className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   {Object.entries(ACTIVITY_TYPES).map(([key, value]) => (
-                    <option key={key} value={key}>
-                      {value.label}
-                    </option>
+                    <option key={key} value={key}>{value.label}</option>
                   ))}
                 </select>
               </div>
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Time
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Time</label>
               <input
                 type="datetime-local"
                 value={selectedTime}
@@ -247,11 +211,8 @@ function KidsLog() {
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Notes (optional)
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
               <input
                 type="text"
                 value={notes}
@@ -260,7 +221,6 @@ function KidsLog() {
                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
-
             <button
               onClick={handleAddEntry}
               className="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 flex items-center justify-center gap-2"
@@ -269,11 +229,8 @@ function KidsLog() {
             </button>
           </div>
         </div>
-
-        {/* Entries List */}
         <div className="space-y-3">
           <h2 className="text-lg font-semibold text-gray-800">Recent Entries (Last 10 Days)</h2>
-
           {entries.length === 0 ? (
             <div className="bg-gray-100 rounded-lg p-8 text-center text-gray-500">
               No entries yet. Add one to get started!
@@ -289,19 +246,14 @@ function KidsLog() {
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-semibold">{entry.childName}</span>
-                    <span className="text-sm opacity-75">
-                      {ACTIVITY_TYPES[entry.activityType].label}
-                    </span>
+                    <span className="text-sm opacity-75">{ACTIVITY_TYPES[entry.activityType].label}</span>
                   </div>
                   <div className="flex items-center gap-1 text-sm opacity-75 mb-1">
                     <Clock size={14} />
                     {new Date(entry.timestamp).toLocaleString()}
                   </div>
-                  {entry.notes && (
-                    <p className="text-sm opacity-85">{entry.notes}</p>
-                  )}
+                  {entry.notes && <p className="text-sm opacity-85">{entry.notes}</p>}
                 </div>
-
                 <div className="flex gap-2 ml-4">
                   <button
                     onClick={() => {
@@ -332,4 +284,4 @@ function KidsLog() {
   );
 }
 
-export de
+export default KidsLog;
