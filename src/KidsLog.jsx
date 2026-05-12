@@ -6,9 +6,9 @@ import { Clock, Plus, Trash2, Edit2 } from 'lucide-react';
 
 // Firebase config
 const firebaseConfig = {
-  apiKey: "AIzaSyAptgdDlUwq1UVYeIGlny5Bfewz1A1Xw",
+  apiKey: "AIzaSyAptgqDIUtwq1UVYeIGln1y5BfewzLA1Xw",
   authDomain: "kid-tracking-75156.firebaseapp.com",
-  databaseURL: "https://kid-tracking-75156.firebaseio.com",
+  databaseURL: "https://kid-tracking-75156-default-rtdb.firebaseio.com",
   projectId: "kid-tracking-75156",
   storageBucket: "kid-tracking-75156.firebasestorage.app",
   messagingSenderId: "210212922724",
@@ -332,4 +332,4 @@ function KidsLog() {
   );
 }
 
-export default KidsLog;
+export de
